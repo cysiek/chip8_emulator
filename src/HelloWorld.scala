@@ -10,13 +10,19 @@ package object bitOperations
 
   def pack2ValuesToByte(olderBits : Byte, youngerBits : Byte) : Byte =
   {
-    (olderBits << 4 | youngerBits).toByte
+    (olderBits << 4 | (youngerBits & 15)).toByte
   }
 
   def pack2ValuesToShort(olderBits : Byte, youngerBits : Byte) : Short =
     {
-      (olderBits << 8 | youngerBits).toShort
+      (olderBits << 8 | (youngerBits & 255)).toShort
     }
+
+  // bitIndex is counted from the least significant (0 index -> last bit)
+  def getNthBitValue(value : Byte, bitIndex : Byte): Byte =
+  {
+    (value & (1 << bitIndex)).toByte
+  }
 }
 
 class CpuInstruction(val opcodeValue : Short)
@@ -25,10 +31,35 @@ class CpuInstruction(val opcodeValue : Short)
   {
     var opCodeType : CpuInstructionType = parts(0) match
     {
+      case 0 =>
+      {
+        if (opcodeValue == 0x00E0)
+          CpuInstructionType.DISPLAY
+        else
+          CpuInstructionType.FLOW_CONTROL // either call or return (if (opcodeValue == 0x00EE))
+      }
       case x if (x >= 1 && x <= 5) => CpuInstructionType.FLOW_CONTROL
+      case 6 | 7 | 8 => CpuInstructionType.MATH_OPERATION
       case 9 | 11 => CpuInstructionType.FLOW_CONTROL
-      case 6 | 7 => CpuInstructionType.ASSIGN
+      case 10 => CpuInstructionType.MEMORY
+      case 12 => CpuInstructionType.OTHER
       case 13 => CpuInstructionType.DISPLAY
+      case 14 => CpuInstructionType.KEYBOARD
+      case 15 =>
+      {
+        if (parts(3) == 10)
+          CpuInstructionType.KEYBOARD
+        else if (parts(3) == 3)
+          CpuInstructionType.OTHER //BCD
+        else
+          {
+            val last2Parts = bitOperations.pack2ValuesToByte(parts(2), parts(3))
+            if (last2Parts > 18)
+              CpuInstructionType.MEMORY
+            else
+              CpuInstructionType.TIMER
+          }
+      }
     }
     opCodeType
   }
@@ -53,32 +84,29 @@ class CpuInstruction(val opcodeValue : Short)
 
   val parts : Array[Byte] = bitOperations.unpackTo4Bytes(opcodeValue)
   val opCodeType : CpuInstructionType = decodeType()
-  val XOperand : Option[Byte] = determineXValue()
-  val yOperand : Option[Byte] = determineYValue()
+  val operandX : Option[Byte] = determineXValue()
+  val operandY : Option[Byte] = determineYValue()
 }
 
 object CpuInstructionType extends Enumeration
 {
   type CpuInstructionType = Value
-  val FLOW_CONTROL, ASSIGN, TIMER, DISPLAY, MATH = Value
+  val FLOW_CONTROL, MATH_OPERATION, TIMER, DISPLAY, MEMORY, KEYBOARD, OTHER = Value
 }
-
-//class CpuInstructionExecutor(instruction : CpuInstruction)
-//{
-//
-//}
 
 class Chip8VM()
 {
-  private var pcRegister, iRegister, stackPointer : Short = 0
+  private var pcRegister, iRegister, stackPointer : Short = 0 //iRegister - address register, pc - program counter
 
   private var memory : Array[Byte] = new Array[Byte](4096)
-  private var registers : Array[Byte] = new Array[Byte](16)
+  private var keyboardState : Array[Byte] = new Array[Byte](16)
   //0x000-0x1FF - Chip 8 interpreter (contains font set in emu)
   //0x050-0x0A0 - Used for the built in 4x5 pixel font set (0-F)
   //0x200-0xFFF - Program ROM and work RAM
 
-  private var keyboardState : Array[Byte] = new Array[Byte](16)
+  private var registers : Array[Byte] = new Array[Byte](16)
+  //first 15 - general registers. last one (aka VF) - "VF is the carry flag, while in subtraction, it is the "no borrow" flag. In the draw instruction VF is set upon pixel collision."
+
   private var graphicsMemory : Array[Byte] = new Array[Byte](64*32)
   // a moze bool ?
 
@@ -89,34 +117,74 @@ class Chip8VM()
   def reset(): Unit =
   {
     pcRegister = 0
-    // set (6) register (2) to 31 (1 << 4 | 15)
+    // set (6) register (2) to 31 (31 == 1 << 4 | 15)
     memory(0) = bitOperations.pack2ValuesToByte(6,2)
     memory(1) = bitOperations.pack2ValuesToByte(1, 15)
 
-    // add (7) to register (15) value:  33 (2 << 4 | 1)
-    memory(2) = bitOperations.pack2ValuesToByte(7,15)
+    // add (7) to register (14) value:  33 (2 << 4 | 1)
+    memory(2) = bitOperations.pack2ValuesToByte(7,14)
     memory(3) = bitOperations.pack2ValuesToByte(2, 1)
 
-    // add (7) to register (15) value:  66 (4 << 4 | 2)
-    memory(4) = bitOperations.pack2ValuesToByte(7,15)
+    // add (7) to register (14) value:  66 (4 << 4 | 2)
+    memory(4) = bitOperations.pack2ValuesToByte(7,14)
     memory(5) = bitOperations.pack2ValuesToByte(4, 2)
+
+    // math operation(8): add(4) values from to register (14) and register (2) and store result in register(14)
+    memory(6) = bitOperations.pack2ValuesToByte(8,14)
+    memory(7) = bitOperations.pack2ValuesToByte(2, 4)
+
+    // math operation(8): XOR(4) values from to register (14) and register (2) and store result in register(14)
+    memory(8) = bitOperations.pack2ValuesToByte(8,14)
+    memory(9) = bitOperations.pack2ValuesToByte(2, 3)
+
+    // set (6) register (1) to 67 (67 == 4 << 4 | 3)
+    memory(10) = bitOperations.pack2ValuesToByte(6,1)
+    memory(11) = bitOperations.pack2ValuesToByte(4, 3)
+
+    // set (6) register (15) to 0
+    memory(12) = bitOperations.pack2ValuesToByte(6,15)
+    memory(13) = bitOperations.pack2ValuesToByte(0, 0)
+
+    // math operation(8): rotate right(6) by 1 value from to register (1) and store result in register(1)
+    memory(14) = bitOperations.pack2ValuesToByte(8,1)
+    memory(15) = bitOperations.pack2ValuesToByte(0, 6)
+
+    // math operation(8): rotate right(6) by 1 value from to register (1) and store result in register(1)
+    memory(140) = bitOperations.pack2ValuesToByte(8,1)
+    memory(141) = bitOperations.pack2ValuesToByte(0, 6)
+    // math operation(8): subtract(5): value from to register (1) and register (15) and store result in register(1)
+    memory(142) = bitOperations.pack2ValuesToByte(8,1)
+    memory(143) = bitOperations.pack2ValuesToByte(15, 5)
+    // return from procedure
+    memory(144) = 0
+    memory(145) = 0xEE.toByte
+
+    //call (2) procedure from memory: 140 (hex == 0x8C)
+    memory(16) = 0x20.toByte
+    memory(17) = 0x8C.toByte
+    //call (2) procedure from memory: 140 (hex == 0x8C)
+    memory(18) = 0x20.toByte
+    memory(19) = 0x8C.toByte
     println("registers:", registers.mkString("<", ",", ">"))
   }
 
   def executeSingleCycle(): Unit =
   {
     //fetch opcode
-//    val currentOpcode : Short = (memory(pcRegister) << 8 | memory(pcRegister + 1)).toShort;
     val currentOpcode : Short = bitOperations.pack2ValuesToShort(memory(pcRegister), memory(pcRegister+1))
-    val cpuInstruction = new CpuInstruction(currentOpcode)
-
-    executeSingleInstruction(cpuInstruction)
-    println("registers:", registers.mkString("<", ",", ">"))
-    pcRegister = (pcRegister + 2).toShort
-//    if (opCode.opcodeType)
-    //
     // decode, execute
+    val cpuInstruction = new CpuInstruction(currentOpcode)
+    println("executing instruction: ", (cpuInstruction.opcodeValue.toLong & 0xFFFF).toHexString, ", pc register: ", pcRegister)
+    val updatePcRegister = executeSingleInstruction(cpuInstruction)
+
+    println("registers:", registers.mkString("<", ",", ">"))
+
+    //update pcRegister (program counter)
+    if (updatePcRegister)
+      pcRegister = (pcRegister + 2).toShort
+
     //update timers
+    handleTimers()
   }
 
   def handleTimers(): Unit =
@@ -131,26 +199,102 @@ class Chip8VM()
       }
   }
 
-  def executeSingleInstruction(instruction : CpuInstruction): Unit =
+  //returns true if update of program counter register is required (jump/call was not executed).
+  def executeFlowControlOperation(instruction: CpuInstruction) =
+  {
+    if (instruction.parts(0) == 1 || instruction.parts(0) == 11) // absolute or relative jump
+    {
+      val jumpAddress : Short = (instruction.opcodeValue & 0xFFF).toShort //aka NNN value
+      pcRegister = (jumpAddress + (if (instruction.parts(0) == 1) 0.toByte else registers(0))).toShort
+      false
+    }
+    else if (instruction.parts(0) == 0 || instruction.parts(0) == 2) //call or return
+    {
+      if (instruction.opcodeValue == 0X00EE) //return
+      {
+        pcRegister = stack(stackPointer)
+        stackPointer = (stackPointer - 1).toShort
+        true //true because after returning from procedure we dont want to execute the same instruction (== call) once again
+      }
+      else //call
+      {
+        stackPointer = (stackPointer + 1).toShort
+        stack(stackPointer) = pcRegister
+        pcRegister = (instruction.opcodeValue & 0xFFF).toShort //aka NNN value
+        false
+      }
+    }
+    else //conditional jumps - 3,4,5,9
+    {
+      val vxRegisterValue : Byte = registers(instruction.operandX.get) //left hand side of comparison
+      val rightHandSideOfComparison : Byte = if (instruction.parts(0) == 5) registers(instruction.operandY.get) else bitOperations.pack2ValuesToByte(instruction.parts(2), instruction.parts(3))
+      var executeJump = vxRegisterValue == rightHandSideOfComparison
+      if (instruction.parts(0) == 4 || instruction.parts(0) == 9) //inverted case
+        executeJump = !executeJump
+      if (executeJump)
+      {
+        pcRegister = (pcRegister + 2).toShort
+      }
+      !executeJump
+    }
+}
+
+  //returns true if update of program counter register is required (usual case). false happens only on flow control instructions
+  def executeSingleInstruction(instruction : CpuInstruction): Boolean =
   {
     instruction.opCodeType match
     {
-      case CpuInstructionType.ASSIGN => executeAssignInstruction(instruction) // 6 or 7
-//      case _ => exception or log - unknow instruction
+      case CpuInstructionType.MATH_OPERATION => executeMathOperation(instruction); true // 6 or 7 or 8
+      case CpuInstructionType.FLOW_CONTROL => executeFlowControlOperation(instruction)
+      case _ => throw new  RuntimeException("Not supported opcode: " + instruction.opCodeType.toString)
     }
-
   }
 
-  def executeAssignInstruction(instruction : CpuInstruction): Unit =
+  def calculateMathOperationResult(operationSpecificType: Byte, xOperand: Byte, yOperand: Byte): (Byte, Option[Byte]) =
   {
-//    val rightSide = (instruction.parts(2) << 4 | instruction.parts(3)).toByte
+    //TODO: handle changing flags (VF used for carry and borrow) - important only when
+    // operationSpecificType == 4 - 7 | 14 - most likely done, not sure whether conditions
+    // for carry and borrow should be inclusive (e.g. >= ) or not ( > ) ?
+
+    val operationsMap = Map[Byte, (Byte, Byte) => (Byte, Option[Byte])](
+      0.toByte -> ((x, y) => (y, None)),
+      1.toByte -> ((x, y) => ((x|y).toByte, None)),
+      2.toByte -> ((x, y) => ((x & y).toByte, None)),
+      3.toByte -> ((x, y) => ((x^y).toByte, None)),
+      4.toByte -> ((x, y) => {val res = x+y; (res.toByte, if (res > 127) Some(1.toByte) else Some(0.toByte))}),
+      5.toByte -> ((x, y) => ((x-y).toByte, (if (x >= y) Some(1.toByte) else Some(0.toByte)))),
+      6.toByte -> ((x, y) => ((x >>> 1).toByte, Some(bitOperations.getNthBitValue(x, 0)))),
+      7.toByte -> ((x, y) => ((y-x).toByte, Some(if (y >= x) 1.toByte else 0.toByte))),
+      14.toByte -> ((x, y) => ((x << 1).toByte, Some(bitOperations.getNthBitValue(x, 7))))
+    )
+    val operation = operationsMap.get(operationSpecificType)
+    operation match
+    {
+      case Some(value) => value(xOperand, yOperand)
+      case None => throw new RuntimeException(f"Not supported value in calculateMathOperationResult, operationsSpecificType: $operationSpecificType%s")
+    }
+  }
+
+  def executeMathOperation(instruction : CpuInstruction): Unit =
+  {
     val rightSide = bitOperations.pack2ValuesToByte(instruction.parts(2), instruction.parts(3))
-    registers(instruction.XOperand.get) = instruction.parts(0) match
+    val xOperand = registers(instruction.operandX.get)
+    var operationResult = instruction.parts(0) match
     {
       case 6 => rightSide
-      case 7 => (registers(instruction.XOperand.get) + rightSide).toByte
+      case 7 => (xOperand + rightSide).toByte
         //Note: carry flag should not be changed here
+      case 8 =>
+      {
+        var (newRegisterValue, flagRegisterValue)  = calculateMathOperationResult(instruction.parts(3), xOperand, registers(instruction.operandY.get));
+        if (flagRegisterValue.isDefined)
+          {
+            registers(15) = flagRegisterValue.get
+          }
+        newRegisterValue
+      }
     }
+    registers(instruction.operandX.get) = operationResult
   }
 }
 
@@ -164,8 +308,16 @@ object HelloWorld {
     println("Hello, world!") // prints Hello World
     var c = new Chip8VM()
     c.reset()
-    c.executeSingleCycle()
-    c.executeSingleCycle()
-    c.executeSingleCycle()
+    while(true)
+      {
+        c.executeSingleCycle()
+      }
   }
 }
+
+
+//TODO:
+//wiecej testow
+//obsluga: +call/return, memory, keyboard, timer, display, other
+//+odczytywanie kolejnych instrukcji w petli
+//+obsluga wyjatkow dla nieznanych instrukcji
