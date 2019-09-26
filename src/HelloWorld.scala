@@ -21,7 +21,7 @@ object HelloWorld {
 
 //TODO:
 //wiecej testow
-//obsluga: +call/return, memory, keyboard, timer, display, other
-//zrobione opcody: 0 oprocz display, 1-9, 11,
+//obsluga: +call/return, memory(prawie gotowe, brakuje tylko fx29 - sprite), keyboard, +timer, +display, other
+//zrobione opcody: 0-11, 13
 //+odczytywanie kolejnych instrukcji w petli
 //+obsluga wyjatkow dla nieznanych instrukcji

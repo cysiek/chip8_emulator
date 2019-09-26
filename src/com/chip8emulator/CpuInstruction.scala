@@ -6,6 +6,7 @@ object CpuInstructionType extends Enumeration
 {
   type CpuInstructionType = Value
   val FLOW_CONTROL, MATH_OPERATION, TIMER, DISPLAY, MEMORY, KEYBOARD, OTHER = Value
+  //SOUND is treated as TIMER
 }
 
 class CpuInstruction(val opcodeValue : Short)
@@ -37,7 +38,7 @@ class CpuInstruction(val opcodeValue : Short)
         else
           {
             val last2Parts = bitOperations.pack2ValuesToByte(parts(2), parts(3))
-            if (last2Parts > 18)
+            if (last2Parts > 0x18)
               CpuInstructionType.MEMORY
             else
               CpuInstructionType.TIMER

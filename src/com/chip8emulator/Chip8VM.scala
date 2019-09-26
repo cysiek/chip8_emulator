@@ -2,21 +2,27 @@ package com.chip8emulator
 
 class Chip8VM()
 {
+  private val MemorySize = 4096
+  private val KeyboardStateSize = 16
+  private val NumberOfRegisters = 16
+  private val GraphicsBufferWidth = 64
+  private val GraphicsBufferHeight = 32
+  private val StackSize = 24
+
   private var pcRegister, iRegister, stackPointer : Short = 0 //iRegister - address register, pc - program counter
 
-  private var memory : Array[Byte] = new Array[Byte](4096)
-  private var keyboardState : Array[Byte] = new Array[Byte](16)
+  private var memory : Array[Byte] = new Array[Byte](MemorySize)
+  private var keyboardState : Array[Byte] = new Array[Byte](KeyboardStateSize)
   //0x000-0x1FF - Chip 8 interpreter (contains font set in emu)
   //0x050-0x0A0 - Used for the built in 4x5 pixel font set (0-F)
   //0x200-0xFFF - Program ROM and work RAM
 
-  private var registers : Array[Byte] = new Array[Byte](16)
+  private var registers : Array[Byte] = new Array[Byte](NumberOfRegisters)
   //first 15 - general registers. last one (aka VF) - "VF is the carry flag, while in subtraction, it is the "no borrow" flag. In the draw instruction VF is set upon pixel collision."
 
-  private var graphicsMemory : Array[Byte] = new Array[Byte](64*32)
-  // a moze bool ?
+  private var graphicsMemory : Array[Boolean] = new Array[Boolean](GraphicsBufferWidth*GraphicsBufferHeight)
 
-  private var stack : Array[Short] = new Array[Short](24)
+  private var stack : Array[Short] = new Array[Short](StackSize)
 
   private var delayTimer, soundTimer : Byte = 0
 
@@ -106,7 +112,7 @@ class Chip8VM()
   }
 
   //returns true if update of program counter register is required (jump/call was not executed).
-  def executeFlowControlOperation(instruction: CpuInstruction) =
+  def executeFlowControlOperation(instruction: CpuInstruction): Boolean =
   {
     if (instruction.parts(0) == 1 || instruction.parts(0) == 11) // absolute or relative jump
     {
@@ -143,6 +149,7 @@ class Chip8VM()
       }
       !executeJump
     }
+    //todo: add throwing exception here in parts(0) is not in 3,4,5,9
 }
 
   //returns true if update of program counter register is required (usual case). false happens only on flow control instructions
@@ -153,13 +160,15 @@ class Chip8VM()
       case CpuInstructionType.MATH_OPERATION => executeMathOperation(instruction); true // 6 or 7 or 8
       case CpuInstructionType.FLOW_CONTROL => executeFlowControlOperation(instruction)
       case CpuInstructionType.MEMORY => executeMemoryOperation(instruction); true
+      case CpuInstructionType.TIMER => executeTimerOperation(instruction); true
+      case CpuInstructionType.DISPLAY => executeDisplayOperation(instruction); true
       case _ => throw new  RuntimeException("Not supported opcode: " + instruction.opCodeType.toString)
     }
   }
 
   def calculateMathOperationResult(operationSpecificType: Byte, xOperand: Byte, yOperand: Byte): (Byte, Option[Byte]) =
   {
-    //TODO: handle changing flags (VF used for carry and borrow) - important only when
+    //DONE: handle changing flags (VF used for carry and borrow) - important only when
     // operationSpecificType == 4 - 7 | 14 - most likely done, not sure whether conditions
     // for carry and borrow should be inclusive (e.g. >= ) or not ( > ) ? -- done, but tests would be nice :)
 
@@ -196,23 +205,94 @@ class Chip8VM()
         var (newRegisterValue, flagRegisterValue)  = calculateMathOperationResult(instruction.parts(3), xOperand, registers(instruction.operandY.get));
         if (flagRegisterValue.isDefined)
           {
-            registers(15) = flagRegisterValue.get
+            registers(0xF) = flagRegisterValue.get
           }
         newRegisterValue
       }
+      case _ => throw new RuntimeException("Not supported instruction: " + instruction.toString)
     }
     registers(instruction.operandX.get) = operationResult
   }
 
   def executeMemoryOperation(instruction: CpuInstruction): Unit =
   {
-    if (instruction.parts(0) == 10)
+    if (instruction.parts(0) == 0xA)
       {
         iRegister = (instruction.opcodeValue & 0xFFF).toShort //aka NNN value
       }
-    else //todo: handle all cases starting with F
+    else if ((instruction.opcodeValue & 0x00FF) == 0x1E)
       {
-
+        iRegister = (iRegister + registers(instruction.operandX.get)).toShort
       }
+    else if ((instruction.opcodeValue & 0x00FF) == 0x29)
+      {
+        //todo: handle sprite loading
+      }
+    else if ((instruction.opcodeValue & 0x00FF) == 0x55)
+      {
+        //reg dump
+        for {i <- 0 to instruction.operandX.get}
+        {
+          memory(iRegister + i) = registers(i)
+        }
+      }
+    else if ((instruction.opcodeValue & 0x00FF) == 0x65)
+    {
+      //reg load
+      for {i <- 0 to instruction.operandX.get}
+      {
+        registers(i) = memory(iRegister + i)
+      }
+    }else
+    throw new RuntimeException("Not supported instruction: " + instruction.toString)
+  }
+
+  def executeTimerOperation(instruction: CpuInstruction): Unit =
+  {
+    //timer and sound
+    if (instruction.parts(3) == 7)
+      {
+        registers(instruction.operandX.get) = delayTimer
+      }
+    else if (instruction.parts(3) == 0x15)
+      {
+        delayTimer = registers(instruction.operandX.get)
+      }
+    else if (instruction.parts(3) == 0x18)
+      {
+        soundTimer = registers(instruction.operandX.get)
+      }else
+      throw new RuntimeException("Not supported instruction: " + instruction.toString)
+  }
+
+  def executeDisplayOperation(instruction: CpuInstruction): Unit =
+  {
+    if (instruction.parts(0) == 0)
+      {
+        graphicsMemory = Array.fill[Boolean](GraphicsBufferWidth * GraphicsBufferHeight)(false)
+      }
+    else if (instruction.parts(0) == 0xD)
+      {
+        val xPos = instruction.operandX.get
+        val yPos = instruction.operandY.get
+        val spriteWidth = 8
+        val spriteHeight = instruction.parts(2)
+        var finalVFValue = false
+        for {y <- yPos until spriteHeight+yPos}
+          {
+            for {x <- xPos until spriteWidth+xPos}
+              {
+                val memoryLocation = GraphicsBufferWidth / 8 * y + xPos / 8 //in bytes
+                val bitIndex : Byte = (x - xPos).toByte
+                val oldPixelValue = graphicsMemory(memoryLocation*8 + bitIndex)
+                val spritePixelValue : Boolean = bitOperations.getNthBitValue(memory(iRegister + memoryLocation), bitIndex) == 1//todo: is it ok or maybe order of bits should be reverted ?
+                finalVFValue = finalVFValue | (oldPixelValue ^ spritePixelValue)
+                graphicsMemory(memoryLocation*8 + bitIndex) = spritePixelValue
+              }
+          }
+        registers(0xF) = if (finalVFValue) 1 else 0
+      }
+    else
+      throw new RuntimeException("Not supported instruction: " + instruction.toString)
   }
 }
