@@ -24,7 +24,7 @@ package object bitOperations {
 
   // bitIndex is counted from the least significant (0 index -> last bit)
   def getNthBitValue(value: Byte, bitIndex: Byte): Byte = {
-    (value & (1 << bitIndex)).toByte
+    if ((value & (1 << bitIndex)) != 0) 1 else 0
   }
 
   def fillMemoryPart[T](memory: Array[T], srcStartIndex: Int, elements: Array[T]): Unit = {

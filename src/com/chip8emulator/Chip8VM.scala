@@ -117,6 +117,17 @@ class Chip8VM() {
     pcRegister = 0x200
   }
 
+  def loadShowTestSpriteProgram() : Unit = {
+    val program = List(0x00, 0xe0, 0xa3, 0x00, 0x60, 0x0A, 0x61, 0x05, 0xD0, 0x1F, 0x12, 0x0A).map(_.toByte)
+    // clear display, I = 0x300, V0 = 0xA, V1 = 0x5, 0xD01F - draw sprite (height == 0xF), 0x120A - jump to 20A (addres of this instruction)
+    val sprite = List(0x01, 0xFF, 0xFF, 0x00, 0xF0, 0x0F, 0xAA, 0x55, 0xCC, 0xFF, 0xFF, 0x00, 0xF0, 0x0F, 0xAA).map(_.toByte)
+    // one white pixel-all black pixels, 2x white line, black line, half white-half black, half black-half white ,
+    // white-black(exchanging), black-white(exchanging), 2white-2black etc, white line -
+    bitOperations.fillMemoryPart[Byte](memory, 0x200, program.toArray)
+    bitOperations.fillMemoryPart[Byte](memory, 0x300, sprite.toArray)
+    pcRegister = 0x200
+  }
+
   def executeSingleCycle(): Unit = {
     //fetch opcode
     val currentOpcode: Short = bitOperations.pack2ValuesToShort(memory(pcRegister), memory(pcRegister + 1))
@@ -298,8 +309,7 @@ class Chip8VM() {
           val bitIndex: Byte = (x - xPos).toByte
           val oldPixelValue = graphicsMemory(graphicsMemoryLocation * 8 + bitIndex)
           val memoryLocation = (y - yPos) // not multiplied by 8[==sprite width], because each byte store entire row, not single pixel
-          val temp = memory(iRegister + memoryLocation)
-          val spritePixelValue: Boolean = bitOperations.getNthBitValue(temp, bitIndex) == 1 //todo: is it ok or maybe order of bits should be reverted ?
+          val spritePixelValue: Boolean = bitOperations.getNthBitValue(memory(iRegister + memoryLocation), (7-bitIndex).toByte) == 1
           finalVFValue = finalVFValue | (oldPixelValue ^ spritePixelValue)
           graphicsMemory(graphicsMemoryLocation * 8 + bitIndex) = spritePixelValue
         }

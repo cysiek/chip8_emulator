@@ -15,8 +15,9 @@ object HelloWorld {
     var c = new Chip8VM()
     c.reset()
     c.loadIbmLogoProgram()
+//    c.loadShowTestSpriteProgram()
 
-    var display = new DisplayEmulator(c.GraphicsBufferWidth, c.GraphicsBufferHeight)
+    var display = new DisplayEmulator(c.GraphicsBufferWidth, c.GraphicsBufferHeight, 8)
     while (true) {
       display.fillWithDataFromList(c.graphicsMemory)
       display.show()
