@@ -128,6 +128,13 @@ class Chip8VM() {
     pcRegister = 0x200
   }
 
+  def loadShowNumber5SpriteProgram() : Unit = {
+    val program = List(0x00, 0xe0, 0x60, 0x05, 0x61, 0x0A, 0xF0, 0x29, 0xD0, 0x15, 0x12, 0x0A).map(_.toByte)
+    // clear display, V0 = 0x5, V1 = 0xA, I = sprite['5'], 0xD015 - draw sprite (height == 0x5), 0x120A - jump to 20A (addres of this instruction)
+    bitOperations.fillMemoryPart[Byte](memory, 0x200, program.toArray)
+    pcRegister = 0x200
+  }
+
   def executeSingleCycle(): Unit = {
     //fetch opcode
     val currentOpcode: Short = bitOperations.pack2ValuesToShort(memory(pcRegister), memory(pcRegister + 1))
@@ -262,7 +269,7 @@ class Chip8VM() {
       iRegister = (iRegister + registers(instruction.operandX.get)).toShort
     }
     else if ((instruction.opcodeValue & 0x00FF) == 0x29) {
-      iRegister = getDigitSpriteMemoryLocation(instruction.operandX.get).toShort
+      iRegister = getDigitSpriteMemoryLocation(registers(instruction.operandX.get)).toShort
     }
     else if ((instruction.opcodeValue & 0x00FF) == 0x55) {
       //reg dump

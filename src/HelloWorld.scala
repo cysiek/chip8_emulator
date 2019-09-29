@@ -14,8 +14,9 @@ object HelloWorld {
     println("Hello, world!") // prints Hello World
     var c = new Chip8VM()
     c.reset()
-    c.loadIbmLogoProgram()
+//    c.loadIbmLogoProgram()
 //    c.loadShowTestSpriteProgram()
+    c.loadShowNumber5SpriteProgram()
 
     var display = new DisplayEmulator(c.GraphicsBufferWidth, c.GraphicsBufferHeight, 8)
     while (true) {

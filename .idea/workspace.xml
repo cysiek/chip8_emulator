@@ -118,12 +118,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/com/chip8emulator/Chip8VM.scala</url>
-          <line>312</line>
+          <line>319</line>
           <option name="timeStamp" value="17" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/com/chip8emulator/Chip8VM.scala</url>
-          <line>311</line>
+          <line>318</line>
           <option name="timeStamp" value="18" />
         </line-breakpoint>
       </breakpoints>
