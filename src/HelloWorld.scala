@@ -1,6 +1,9 @@
-import com.chip8emulator.CpuInstructionType.CpuInstructionType
-import com.chip8emulator.{Chip8VM, CpuInstruction, bitOperations}
+import java.awt.{FlowLayout, Image}
+import java.awt.image.BufferedImage
 
+import com.chip8emulator.CpuInstructionType.CpuInstructionType
+import com.chip8emulator.{Chip8VM, CpuInstruction, DisplayEmulator, bitOperations}
+import javax.swing.{ImageIcon, JFrame, JLabel}
 
 
 object HelloWorld {
@@ -11,17 +14,24 @@ object HelloWorld {
     println("Hello, world!") // prints Hello World
     var c = new Chip8VM()
     c.reset()
-    while(true)
-      {
-        c.executeSingleCycle()
-      }
+    c.loadIbmLogoProgram()
+
+    var display = new DisplayEmulator(c.GraphicsBufferWidth, c.GraphicsBufferHeight)
+    while (true) {
+      display.fillWithDataFromList(c.graphicsMemory)
+      display.show()
+      c.executeSingleCycle()
+      Thread.sleep((1000.0 / 60.0).toInt)
+    }
   }
 }
 
 
 //TODO:
 //wiecej testow
-//obsluga: +call/return, memory(prawie gotowe, brakuje tylko fx29 - sprite), keyboard, +timer, +display, other
-//zrobione opcody: 0-11, 13
+//obsluga: +call/return, +memory, +keyboard(z grubsza jest...), +timer, +display, +other
+//obsluga czestotliwosci taktowanai procesora (== ograniczyc szybkosc), wczytywanie ROM, ograniczenie rozmiaru stosu,
+// io: klawiatura, +wyswietlacz, glosnik
+//zrobione opcody: 0-15
 //+odczytywanie kolejnych instrukcji w petli
 //+obsluga wyjatkow dla nieznanych instrukcji
