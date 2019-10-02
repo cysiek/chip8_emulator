@@ -112,19 +112,20 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$PROJECT_DIR$/src/HelloWorld.scala</url>
-          <line>9</line>
-          <option name="timeStamp" value="14" />
+          <condition expression="graphicsMemoryLocation &gt; 2048" language="Scala" />
+          <url>file://$PROJECT_DIR$/src/com/chip8emulator/Chip8VM.scala</url>
+          <line>339</line>
+          <option name="timeStamp" value="25" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="scala-line">
+          <url>file://$PROJECT_DIR$/src/com/chip8emulator/Chip8VM.scala</url>
+          <line>391</line>
+          <option name="timeStamp" value="26" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/com/chip8emulator/Chip8VM.scala</url>
           <line>319</line>
-          <option name="timeStamp" value="17" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$PROJECT_DIR$/src/com/chip8emulator/Chip8VM.scala</url>
-          <line>318</line>
-          <option name="timeStamp" value="18" />
+          <option name="timeStamp" value="27" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

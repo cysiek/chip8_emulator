@@ -1,14 +1,40 @@
 package com.chip8emulator
 
-import java.awt.{Color, FlowLayout, Image}
+import java.awt.event.{KeyAdapter, KeyEvent}
+import java.awt.{Color, Component, FlowLayout, Image}
 import java.awt.image.BufferedImage
 
 import javax.swing.{ImageIcon, JFrame, JLabel}
 
-class DisplayEmulator(val displayWidth: Int, val displayHeight: Int, val rescaleFactor : Int) {
+//class KeyboardEmulator extends java.awt.event.KeyListener {
+//  var lastpressedKey : Int = 0
+//  override def keyPressed(event: KeyEvent): Unit = {
+//    lastpressedKey = event.getKeyCode()
+//  }
+//
+//  override def keyReleased(keyEvent: KeyEvent): Unit = {
+//    lastpressedKey = 0
+//  }
+//
+//  override def keyTyped(keyEvent: KeyEvent): Unit = {}
+//}
 
+trait KeyboardEmulator extends java.awt.event.KeyListener {
+  var lastpressedKey : Int = 0
+  override def keyPressed(event: KeyEvent): Unit = {
+    lastpressedKey = event.getKeyCode()
+  }
+
+  override def keyReleased(keyEvent: KeyEvent): Unit = {
+    lastpressedKey = 0
+  }
+
+  override def keyTyped(keyEvent: KeyEvent): Unit = {}
+}
+
+class DisplayEmulator(val displayWidth: Int, val displayHeight: Int, val rescaleFactor: Int) extends KeyboardEmulator {
   val image = new BufferedImage(displayWidth, displayHeight, BufferedImage.TYPE_BYTE_BINARY)
-  var (window, img_jlabel) = prepareWindow(image)
+  var (window, img_jlabel) = prepareWindow()
 
   def setPixelValue(x: Int, y: Int, newValue: Boolean): Unit = {
     image.setRGB(x, y, if (newValue) Color.WHITE.getRGB else Color.BLACK.getRGB)
@@ -27,18 +53,22 @@ class DisplayEmulator(val displayWidth: Int, val displayHeight: Int, val rescale
     }
   }
 
-  private def prepareWindow(img : BufferedImage) = {
+  private def prepareWindow() = {
     val frame = new JFrame()
     frame.getContentPane.setLayout(new FlowLayout)
-    val img_jlabel = new JLabel(new ImageIcon(img.getScaledInstance(img.getWidth() * rescaleFactor, img.getHeight() * rescaleFactor, Image.SCALE_REPLICATE)))
+    val img_jlabel = new JLabel(new ImageIcon(image.getScaledInstance(image.getWidth() * rescaleFactor, image.getHeight() * rescaleFactor, Image.SCALE_REPLICATE)))
     frame.getContentPane.add(img_jlabel)
     frame.pack()
+    frame.setVisible(true)
+    frame.addKeyListener(this)
     (frame, img_jlabel)
   }
 
-  def show() : Unit = {
+  def show(): Unit = {
     img_jlabel.setIcon(new ImageIcon(image.getScaledInstance(image.getWidth() * rescaleFactor, image.getHeight() * rescaleFactor, Image.SCALE_REPLICATE)))
-    window.setVisible(true)
     window.repaint()
   }
 }
+
+
+

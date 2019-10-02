@@ -1,0 +1,6 @@
+.dropbox
+*.o
+chip8
+*.swp
+*.pyc
+test
