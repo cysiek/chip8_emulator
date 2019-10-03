@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9ab6bb02-1287-4b2a-92bb-8d17cd60df15" name="Default Changelist" comment="" />
+    <list default="true" id="50f0c2d2-2e5c-4e29-84bc-64a745b6616b" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -11,32 +11,26 @@
   <component name="CodeStyleSettingsInfer">
     <option name="done" value="true" />
   </component>
-  <component name="FavoritesManager">
-    <favorites_list name="chip8_emulator" />
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Scala Object" />
-        <option value="Scala Class" />
+        <option value="Scala Worksheet" />
       </list>
     </option>
-  </component>
-  <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectCodeStyleSettingsMigration">
     <option name="version" value="1" />
   </component>
-  <component name="ProjectId" id="1Qi1CZhej5CWZ2zYLZdP1Y21I9V" />
+  <component name="ProjectId" id="1Ri9dujhP90rFZB5DplToXeyv7I" />
   <component name="PropertiesComponent">
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
-  </component>
-  <component name="RecentsManager">
-    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
-      <recent name="com.chip8emulator" />
-      <recent name="com.chip8emulator.bitOperations" />
-    </key>
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.19117647" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -58,27 +52,72 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Scala Console" type="ScalaScriptConsoleRunConfiguration" factoryName="Scala Console" temporary="true" show_console_on_std_err="false" show_console_on_std_out="false">
+    <configuration name="ScalaTests in 'scala'" type="ScalaTestRunConfiguration" factoryName="ScalaTest" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
       <module name="chip8_emulator" />
       <option name="allowRunningInParallel" value="false" />
-      <option name="javaOptions" value="-Djline.terminal=NONE" />
-      <option name="myConsoleArgs" value="" />
-      <option name="workingDirectory" value="$PROJECT_DIR$" />
+      <option name="testKind" value="Class" />
+      <option name="classBuf">
+        <list>
+          <option value="CpuInstructionExecutorTests" />
+        </list>
+      </option>
+      <option name="envs">
+        <map />
+      </option>
+      <option name="javaOptions" value="" />
+      <option name="jrePath" />
+      <option name="searchTest" value="Across module dependencies" />
+      <option name="showProgressMessages" value="true" />
+      <option name="testArgs" value="" />
+      <option name="testPackagePath" value="" />
+      <option name="useSbt" value="false" />
+      <option name="useUiWithSbt" value="false" />
+      <option name="workingDirectory" value="C:\Users\cysie\IdeaProjects\chip8_emulator" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <list>
+      <item itemvalue="Application.HelloWorld" />
+      <item itemvalue="ScalaTest.ScalaTests in 'scala'" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Application.HelloWorld" />
-        <item itemvalue="Scala Console.Scala Console" />
+        <item itemvalue="ScalaTest.ScalaTests in 'scala'" />
       </list>
     </recent_temporary>
   </component>
-  <component name="ScalaProjectSettings">
-    <option name="intInjectionMapping">
+  <component name="SbtLocalSettings">
+    <option name="availableProjects">
       <map>
-        <entry key="xml" value="XML" />
+        <entry>
+          <key>
+            <ExternalProjectPojo>
+              <option name="name" value="chip8_emulator" />
+              <option name="path" value="$PROJECT_DIR$" />
+            </ExternalProjectPojo>
+          </key>
+          <value>
+            <list>
+              <ExternalProjectPojo>
+                <option name="name" value="chip8_emulator [file:/C:/Users/cysie/IdeaProjects/chip8_emulator/]" />
+                <option name="path" value="$PROJECT_DIR$" />
+              </ExternalProjectPojo>
+              <ExternalProjectPojo>
+                <option name="name" value="chip8_emulator-build" />
+                <option name="path" value="$PROJECT_DIR$/project" />
+              </ExternalProjectPojo>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="modificationStamps">
+      <map>
+        <entry key="$PROJECT_DIR$" value="3140280310514" />
+        <entry key="$PROJECT_DIR$/build.sbt" value="4074522810" />
+        <entry key="$PROJECT_DIR$/project/build.properties" value="2868604264" />
       </map>
     </option>
   </component>
@@ -87,45 +126,26 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="9ab6bb02-1287-4b2a-92bb-8d17cd60df15" name="Default Changelist" comment="" />
-      <created>1568238475642</created>
+      <changelist id="50f0c2d2-2e5c-4e29-84bc-64a745b6616b" name="Default Changelist" comment="" />
+      <created>1570139139330</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1568238475642</updated>
+      <updated>1570139139330</updated>
     </task>
     <servers />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State>
-              <option name="COLUMN_ORDER" />
-            </State>
-          </value>
-        </entry>
-      </map>
-    </option>
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="scala-line">
-          <condition expression="graphicsMemoryLocation &gt; 2048" language="Scala" />
-          <url>file://$PROJECT_DIR$/src/com/chip8emulator/Chip8VM.scala</url>
-          <line>339</line>
-          <option name="timeStamp" value="25" />
+          <url>file://$PROJECT_DIR$/src/test/scala/CpuInstructionExecutorTests.scala</url>
+          <line>29</line>
+          <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$PROJECT_DIR$/src/com/chip8emulator/Chip8VM.scala</url>
-          <line>391</line>
-          <option name="timeStamp" value="26" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$PROJECT_DIR$/src/com/chip8emulator/Chip8VM.scala</url>
-          <line>319</line>
-          <option name="timeStamp" value="27" />
+          <url>file://$PROJECT_DIR$/src/main/scala/com/chip8emulator/Chip8VM.scala</url>
+          <line>215</line>
+          <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
