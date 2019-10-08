@@ -10,6 +10,7 @@ class CpuInstructionExecutorTests extends FlatSpec {
     assert(emulator.memory.drop(512).forall(_ == 0))
   }
 
+  //0x9XY0
   "A conditional jump instruction " should "trigger jump only if condition is satisfied" in {
     var emulator = new Chip8VM()
     emulator.reset()
@@ -34,4 +35,23 @@ class CpuInstructionExecutorTests extends FlatSpec {
     //V0 and V1 are not equal, therefor jump should be taken -> pcRegister should be equal to addres of comparison + 4
     assert(emulator.pcRegister == 0x208)
   }
+
+  //0xBNNN
+  "A unconditional absolute jump instruction " should " jump to proper location" in {
+    var emulator = new Chip8VM()
+    emulator.reset()
+    emulator.pcRegister = 0x200
+
+    emulator.registers(0) = 8
+
+    //jump to NNN( == 0x128) + V0
+    emulator.memory(0x200) = 0xB1.toByte
+    emulator.memory(0x201) = 0x28.toByte
+
+    emulator.executeSingleCycle(0)
+
+    assert(emulator.pcRegister == 0x128 + 8)
+  }
+
+  //todo: testy: call, return, 0xANNN ( I = NNN), reg_dump, reg_load
 }

@@ -23,10 +23,14 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="ProjectCodeStyleSettingsMigration">
     <option name="version" value="1" />
   </component>
   <component name="ProjectId" id="1Ri9dujhP90rFZB5DplToXeyv7I" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
@@ -44,7 +48,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.HelloWorld">
+  <component name="RunManager" selected="ScalaTest.ScalaTests in 'scala'">
     <configuration name="HelloWorld" type="Application" factoryName="Application" temporary="true">
       <option name="MAIN_CLASS_NAME" value="HelloWorld" />
       <module name="chip8_emulator" />
@@ -56,11 +60,6 @@
       <module name="chip8_emulator" />
       <option name="allowRunningInParallel" value="false" />
       <option name="testKind" value="Class" />
-      <option name="classBuf">
-        <list>
-          <option value="CpuInstructionExecutorTests" />
-        </list>
-      </option>
       <option name="envs">
         <map />
       </option>
@@ -69,7 +68,7 @@
       <option name="searchTest" value="Across module dependencies" />
       <option name="showProgressMessages" value="true" />
       <option name="testArgs" value="" />
-      <option name="testPackagePath" value="" />
+      <option name="testClassPath" value="CpuInstructionExecutorTests" />
       <option name="useSbt" value="false" />
       <option name="useUiWithSbt" value="false" />
       <option name="workingDirectory" value="C:\Users\cysie\IdeaProjects\chip8_emulator" />
@@ -83,8 +82,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.HelloWorld" />
         <item itemvalue="ScalaTest.ScalaTests in 'scala'" />
+        <item itemvalue="Application.HelloWorld" />
       </list>
     </recent_temporary>
   </component>
@@ -134,6 +133,19 @@
     </task>
     <servers />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -143,9 +155,19 @@
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
+          <url>file://$PROJECT_DIR$/src/main/scala/HelloWorld.scala</url>
+          <line>35</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/main/scala/com/chip8emulator/Chip8VM.scala</url>
-          <line>215</line>
-          <option name="timeStamp" value="2" />
+          <line>374</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="scala-line">
+          <url>file://$PROJECT_DIR$/src/main/scala/HelloWorld.scala</url>
+          <line>31</line>
+          <option name="timeStamp" value="6" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

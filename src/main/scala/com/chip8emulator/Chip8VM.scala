@@ -21,7 +21,7 @@ class Chip8VM() {
   //0x050-0x0A0 - Used for the built in 4x5 pixel font set (0-F)
   //0x200-0xFFF - Program ROM and work RAM
 
-  private var registers: Array[Byte] = new Array[Byte](NumberOfRegisters)
+  var registers: Array[Byte] = new Array[Byte](NumberOfRegisters)
   //first 15 - general registers. last one (aka VF) - "VF is the carry flag, while in subtraction, it is the "no borrow" flag. In the draw instruction VF is set upon pixel collision."
 
   var graphicsMemory: Array[Boolean] = new Array[Boolean](GraphicsBufferWidth * GraphicsBufferHeight)
