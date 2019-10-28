@@ -48,7 +48,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="ScalaTest.ScalaTests in 'scala'">
+  <component name="RunManager" selected="Application.HelloWorld">
     <configuration name="HelloWorld" type="Application" factoryName="Application" temporary="true">
       <option name="MAIN_CLASS_NAME" value="HelloWorld" />
       <module name="chip8_emulator" />
@@ -82,8 +82,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="ScalaTest.ScalaTests in 'scala'" />
         <item itemvalue="Application.HelloWorld" />
+        <item itemvalue="ScalaTest.ScalaTests in 'scala'" />
       </list>
     </recent_temporary>
   </component>
@@ -156,18 +156,23 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/main/scala/HelloWorld.scala</url>
-          <line>35</line>
+          <line>52</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/main/scala/com/chip8emulator/Chip8VM.scala</url>
-          <line>374</line>
+          <line>324</line>
           <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/main/scala/HelloWorld.scala</url>
-          <line>31</line>
+          <line>47</line>
           <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="scala-line">
+          <url>file://$PROJECT_DIR$/src/main/scala/com/chip8emulator/Chip8VM.scala</url>
+          <line>137</line>
+          <option name="timeStamp" value="10" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

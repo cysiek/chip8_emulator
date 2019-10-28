@@ -12,7 +12,7 @@ class Chip8VM() {
   private val DigitsSpritesMemoryStart = 0x100
   private val SingleDigitSpriteMemorySize = 5
 
-  private var iRegister, stackPointer: Short = 0 //iRegister - address register
+  var iRegister, stackPointer: Short = 0 //iRegister - address register
   var pcRegister : Short = 0; // pc - program counter
 
   var memory: Array[Byte] = new Array[Byte](MemorySize)
@@ -57,57 +57,6 @@ class Chip8VM() {
       bitOperations.fillMemoryPart[Byte](memory, getDigitSpriteMemoryLocation(digitIndex), digits(digitIndex).toArray)
     }
 
-  }
-
-  def setMemoryForSimpleTests(): Unit = {
-    // set (6) register (2) to 31 (31 == 1 << 4 | 15)
-    memory(0) = bitOperations.pack2ValuesToByte(6, 2)
-    memory(1) = bitOperations.pack2ValuesToByte(1, 15)
-
-    // add (7) to register (14) value:  33 (2 << 4 | 1)
-    memory(2) = bitOperations.pack2ValuesToByte(7, 14)
-    memory(3) = bitOperations.pack2ValuesToByte(2, 1)
-
-    // add (7) to register (14) value:  66 (4 << 4 | 2)
-    memory(4) = bitOperations.pack2ValuesToByte(7, 14)
-    memory(5) = bitOperations.pack2ValuesToByte(4, 2)
-
-    // math operation(8): add(4) values from to register (14) and register (2) and store result in register(14)
-    memory(6) = bitOperations.pack2ValuesToByte(8, 14)
-    memory(7) = bitOperations.pack2ValuesToByte(2, 4)
-
-    // math operation(8): XOR(4) values from to register (14) and register (2) and store result in register(14)
-    memory(8) = bitOperations.pack2ValuesToByte(8, 14)
-    memory(9) = bitOperations.pack2ValuesToByte(2, 3)
-
-    // set (6) register (1) to 67 (67 == 4 << 4 | 3)
-    memory(10) = bitOperations.pack2ValuesToByte(6, 1)
-    memory(11) = bitOperations.pack2ValuesToByte(4, 3)
-
-    // set (6) register (15) to 0
-    memory(12) = bitOperations.pack2ValuesToByte(6, 15)
-    memory(13) = bitOperations.pack2ValuesToByte(0, 0)
-
-    // math operation(8): rotate right(6) by 1 value from to register (1) and store result in register(1)
-    memory(14) = bitOperations.pack2ValuesToByte(8, 1)
-    memory(15) = bitOperations.pack2ValuesToByte(0, 6)
-
-    // math operation(8): rotate right(6) by 1 value from to register (1) and store result in register(1)
-    memory(140) = bitOperations.pack2ValuesToByte(8, 1)
-    memory(141) = bitOperations.pack2ValuesToByte(0, 6)
-    // math operation(8): subtract(5): value from to register (1) and register (15) and store result in register(1)
-    memory(142) = bitOperations.pack2ValuesToByte(8, 1)
-    memory(143) = bitOperations.pack2ValuesToByte(15, 5)
-    // return from procedure
-    memory(144) = 0
-    memory(145) = 0xEE.toByte
-
-    //call (2) procedure from memory: 140 (hex == 0x8C)
-    memory(16) = 0x20.toByte
-    memory(17) = 0x8C.toByte
-    //call (2) procedure from memory: 140 (hex == 0x8C)
-    memory(18) = 0x20.toByte
-    memory(19) = 0x8C.toByte
   }
 
   def reset(): Unit = {
@@ -252,11 +201,12 @@ class Chip8VM() {
       3.toByte -> ((x, y) => ((x ^ y).toByte, None)),
       4.toByte -> ((x, y) => {
         val res = x + y;
-        (res.toByte, if (res > 127) Some(1.toByte) else Some(0.toByte))
+//        (res.toByte, if (res > 127) Some(1.toByte) else Some(0.toByte))
+        (res.toByte, if (res > 255) Some(1.toByte) else Some(0.toByte))
       }),
-      5.toByte -> ((x, y) => ((x - y).toByte, (if (x >= y) Some(1.toByte) else Some(0.toByte)))),
+      5.toByte -> ((x, y) => ((x - y).toByte, (if (x > y) Some(1.toByte) else Some(0.toByte)))),
       6.toByte -> ((x, y) => ((x >>> 1).toByte, Some(bitOperations.getNthBitValue(x, 0)))),
-      7.toByte -> ((x, y) => ((y - x).toByte, Some(if (y >= x) 1.toByte else 0.toByte))),
+      7.toByte -> ((x, y) => ((y - x).toByte, Some(if (y > x) 1.toByte else 0.toByte))),
       14.toByte -> ((x, y) => ((x << 1).toByte, Some(bitOperations.getNthBitValue(x, 7))))
     )
     val operation = operationsMap.get(operationSpecificType)
