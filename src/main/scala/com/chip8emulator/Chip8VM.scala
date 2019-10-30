@@ -312,10 +312,11 @@ class Chip8VM() {
         registers(instruction.operandX.get) = (scala.util.Random.nextInt(256) & nnValue).toByte
       case 0xF =>
         //BCD
-        val number = "%03d".format(registers(instruction.operandX.get))
-        memory(iRegister + 0) = number(0).toByte
-        memory(iRegister + 1) = number(1).toByte
-        memory(iRegister + 2) = number(2).toByte
+        val regValue = registers(instruction.operandX.get).asInstanceOf[Short] & 0xFF
+        val number = "%03d".format(regValue)
+        memory(iRegister + 0) = number(0).asDigit.toByte
+        memory(iRegister + 1) = number(1).asDigit.toByte
+        memory(iRegister + 2) = number(2).asDigit.toByte
       case _ => throw new RuntimeException("Not supported instruction: " + instruction.toString)
     }
   }
