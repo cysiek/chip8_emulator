@@ -65,3 +65,11 @@ object HelloWorld {
 //+odczytywanie kolejnych instrukcji w petli
 //+obsluga wyjatkow dla nieznanych instrukcji
 //rozkminic czy w calculateMathOperationResult powinno byc "(res.toByte, if (res > 255) Some(1.toByte) else Some(0.toByte))" czy 255->127
+
+//linki:
+//https://en.wikipedia.org/wiki/CHIP-8#Virtual_machine_description
+//http://devernay.free.fr/hacks/chip8/C8TECH10.HTM#8xyE
+//  https://github.com/Dillonb/chip8
+//https://massung.github.io/CHIP-8/
+//  https://github.com/DavidJowett/chip8-emulator/blob/master/test/chip8_test.c
+//https://github.com/SnoozeTime/chip8/blob/master/test/opcode_test.cc
