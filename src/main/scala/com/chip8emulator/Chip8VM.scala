@@ -26,9 +26,9 @@ class Chip8VM() {
 
   var graphicsMemory: Array[Boolean] = new Array[Boolean](GraphicsBufferWidth * GraphicsBufferHeight)
 
-  private var stack: Array[Short] = new Array[Short](StackSize)
+  var stack: Array[Short] = new Array[Short](StackSize)
 
-  private var delayTimer, soundTimer: Byte = 0
+  var delayTimer, soundTimer: Byte = 0
 
   private var isWaitinigForKeypress: Boolean = false
 
@@ -101,6 +101,11 @@ class Chip8VM() {
     pcRegister = 0x200
   }
 
+  def loadProgramFromBuffer(code : List[Byte], srcStartIndex: Short = 0): Unit = {
+    bitOperations.fillMemoryPart[Byte](memory, srcStartIndex, code.toArray)
+    pcRegister = srcStartIndex
+  }
+
   def executeSingleCycle(lastpressedKey: Int): Unit = {
     println("lastpressedKey: ", lastpressedKey)
     //fetch opcode
@@ -145,14 +150,14 @@ class Chip8VM() {
     {
       if (instruction.opcodeValue == 0X00EE) //return
       {
-        pcRegister = stack(stackPointer)
         stackPointer = (stackPointer - 1).toShort
+        pcRegister = stack(stackPointer)
         true //true because after returning from procedure we don't want to execute the same instruction (== call) once again
       }
       else //call
       {
-        stackPointer = (stackPointer + 1).toShort
         stack(stackPointer) = pcRegister
+        stackPointer = (stackPointer + 1).toShort
         pcRegister = (instruction.opcodeValue & 0xFFF).toShort //aka NNN value
         false
       }
@@ -200,13 +205,25 @@ class Chip8VM() {
       2.toByte -> ((x, y) => ((x & y).toByte, None)),
       3.toByte -> ((x, y) => ((x ^ y).toByte, None)),
       4.toByte -> ((x, y) => {
-        val res = x + y;
+        val realX = bitOperations.getUnsignedValue(x)
+        val realY = bitOperations.getUnsignedValue(y)
+        val res = realX + realY;
 //        (res.toByte, if (res > 127) Some(1.toByte) else Some(0.toByte))
         (res.toByte, if (res > 255) Some(1.toByte) else Some(0.toByte))
       }),
-      5.toByte -> ((x, y) => ((x - y).toByte, (if (x > y) Some(1.toByte) else Some(0.toByte)))),
+      5.toByte -> ((x, y) => {
+        val realX = bitOperations.getUnsignedValue(x)
+        val realY = bitOperations.getUnsignedValue(y)
+        val res = realX - realY;
+        (res.toByte, (if (realX > realY) Some(1.toByte) else Some(0.toByte)))
+      }),
       6.toByte -> ((x, y) => ((x >>> 1).toByte, Some(bitOperations.getNthBitValue(x, 0)))),
-      7.toByte -> ((x, y) => ((y - x).toByte, Some(if (y > x) 1.toByte else 0.toByte))),
+      7.toByte -> ((x, y) => {
+        val realX = bitOperations.getUnsignedValue(x)
+        val realY = bitOperations.getUnsignedValue(y)
+        val res = realY - realX;
+        (res.toByte, Some(if (realY > realX) 1.toByte else 0.toByte))
+      }),
       14.toByte -> ((x, y) => ((x << 1).toByte, Some(bitOperations.getNthBitValue(x, 7))))
     )
     val operation = operationsMap.get(operationSpecificType)

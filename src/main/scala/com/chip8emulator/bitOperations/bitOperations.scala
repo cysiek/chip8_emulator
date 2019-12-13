@@ -37,4 +37,8 @@ package object bitOperations {
     }
     existingList
   }
+
+  def getUnsignedValue(value: Byte) : Short = {
+    (value.toShort & 0xFF).toShort
+  }
 }

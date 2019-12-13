@@ -13,14 +13,14 @@ object HelloWorld {
     var emulator = new Chip8VM()
     emulator.reset()
     //dzialajace:
-    //emulator.loadShowTestSpriteProgram()
-    //emulator.loadShowNumber5SpriteProgram()
-    emulator.loadProgramFromFile("C:\\Users\\cysie\\IdeaProjects\\chip8_emulator\\data\\IBM Logo.ch8")
-    //emulator.loadProgramFromFile("C:\\Users\\cysie\\IdeaProjects\\chip8_emulator\\data\\Zero Demo [zeroZshadow, 2007].ch8")
-    //emulator.loadProgramFromFile("C:\\Users\\cysie\\IdeaProjects\\chip8_emulator\\data\\chip8-master\\programs\\Random Number Test [Matthew Mikolay, 2010].ch8")
+//    emulator.loadShowTestSpriteProgram()
+//    emulator.loadShowNumber5SpriteProgram()
+//    emulator.loadProgramFromFile("C:\\Users\\cysie\\IdeaProjects\\chip8_emulator\\data\\IBM Logo.ch8")
+//    emulator.loadProgramFromFile("C:\\Users\\cysie\\IdeaProjects\\chip8_emulator\\data\\Zero Demo [zeroZshadow, 2007].ch8")
+//    emulator.loadProgramFromFile("C:\\Users\\cysie\\IdeaProjects\\chip8_emulator\\data\\chip8-master\\programs\\Random Number Test [Matthew Mikolay, 2010].ch8")
 
     //wyglada ok, ale rzuca warningami - graphicsMemoryLocation: 2118 is outside graphics memory! Either bug or bigger screen should be used. xPos: 6, x: 6, yPos: 33, y: 33, spriteHeight: 1
-    //emulator.loadProgramFromFile("C:\\Users\\cysie\\IdeaProjects\\chip8_emulator\\data\\chip8-master\\demos\\Particle Demo [zeroZshadow, 2008].ch8")
+//    emulator.loadProgramFromFile("C:\\Users\\cysie\\IdeaProjects\\chip8_emulator\\data\\chip8-master\\demos\\Particle Demo [zeroZshadow, 2008].ch8")
 
 
 
@@ -37,7 +37,7 @@ object HelloWorld {
 
     //po kliknieciu kilku przyciskow costam wyswietla, potem rzuca wyjatkiem Exception in thread "main" java.lang.RuntimeException: Not supported value in calculateMathOperationResult, operationsSpecificType: 10
     //	at com.chip8emulator.Chip8VM.calculateMathOperationResult(Chip8VM.scala:214)
-//        emulator.loadProgramFromFile("C:\\Users\\cysie\\IdeaProjects\\chip8_emulator\\data\\chip8-master\\programs\\Clock Program [Bill Fisher, 1981].ch8")
+        emulator.loadProgramFromFile("C:\\Users\\cysie\\IdeaProjects\\chip8_emulator\\data\\chip8-master\\programs\\Clock Program [Bill Fisher, 1981].ch8")
 
     var display = new DisplayEmulator(emulator.GraphicsBufferWidth, emulator.GraphicsBufferHeight, 8)
     var quit = false
